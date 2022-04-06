@@ -17,10 +17,10 @@ struct MimePartsSplitter {
     
     static func findParts(in string: String) -> Parts? {
         var emptyLineRange: Range<String.Index>?
-        var searchRange = string.range
+        var searchRange = string.range // entire string is range
         
         repeat {
-            guard let nextEmptyLineRange = string.rangeOfRFC822NewLine(in: searchRange) else {
+            guard let nextEmptyLineRange = string.rangeOfRFC822NewLine(in: searchRange) else { // first \r?\n
                 break
             }
             
