@@ -10,17 +10,34 @@ import Foundation
 
 struct MimePartsSplitter {
     
+    /**
+     A structure that contains the `header` and `body` ``Range``s of a MIME message.
+     */
     struct Parts {
+        
+        /// The MIME header.
         let header: Range<String.Index>
         let body: Range<String.Index>
     }
     
+    /**
+     Locates and returns the ``Range``s of the header and body of the given MIME message.
+     
+     Starting at the beginning of the string, this function looks for the first occurrence of two consecutive newlines,
+     which denote the separation between the header and body according to the MIME specification.
+     
+     It will then calculate the header range as the beginning of the string up to (but not including) the second newline
+     in the consecutive pair (i.e., it will include the first newline). It will then calculate the body range to be the first character
+     after the second newline to the end of the string.
+     
+     - Returns: A ``Parts`` structure with the header and body ranges.
+     */
     static func findParts(in string: String) -> Parts? {
         var emptyLineRange: Range<String.Index>?
         var searchRange = string.range
         
         repeat {
-            guard let nextEmptyLineRange = string.rangeOfRFC822NewLine(in: searchRange) else { // first \r?\n
+            guard let nextEmptyLineRange = string.rangeOfRFC822NewLine(in: searchRange) else {
                 break
             }
             
