@@ -23,6 +23,12 @@ public struct RFC822HeaderField : Equatable {
 
 struct RFC822HeaderFieldsUnfolder {
     
+    /**
+     Unfolds MIME headers into a single line by replacing any whitespace in the given string
+     matching the regex `\r?\n[[:blank:]]+` with a single space for each occurrence.
+     
+     - Returns: A string with the whitespace modified as described above.
+     */
     func unfold(in string: String) -> String {
         let regex = try! NSRegularExpression(pattern: "\r?\n[[:blank:]]+", options: [])
         let result = regex.stringByReplacingMatches(in: string, options: [], range: string.nsRange, withTemplate: " ")
