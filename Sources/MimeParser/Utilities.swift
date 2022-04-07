@@ -19,23 +19,31 @@ extension Array where Element: Equatable {
 
 extension String {
     
+    /// Returns the ``Range`` of the entire String.
     var range: Range<String.Index> {
         return Range<String.Index>(uncheckedBounds: (lower: startIndex, upper: endIndex))
     }
     
+    /// Returns the ``NSRange`` version of ``range``.
     var nsRange: NSRange {
         return NSRange(range, in: self)
     }
     
+    /**
+     Searches this ``String`` for a newline (using the regex `\r?\n`) within the specified range.
+     
+     - Returns: The ``Range`` of the first matching newline if one is present, or `nil`.
+     */
     func rangeOfRFC822NewLine(in searchRange: Range<String.Index>) -> Range<String.Index>? {
         let regex = try! NSRegularExpression(pattern: "\r?\n", options: [])
         let matchResults = regex.firstMatch(in: self, options: [], range: NSRange(searchRange, in: self))
-        let range = matchResults.flatMap { Range<String.Index>($0.range, in: self) }
+        let range = matchResults.flatMap { Range<String.Index>($0.range, in: self) } // converting from NSRange
         return range
     }
 }
 
 extension String {
+    
     
     func leftTrimmFirstCharacter(in set: CharacterSet) -> String {
         guard startIndex != endIndex else { return self }
