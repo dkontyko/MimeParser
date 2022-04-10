@@ -12,6 +12,9 @@ let invalidQTextChars: CharacterSet = CharacterSet(charactersIn: "\"\\")
 let invalidDTextChars: CharacterSet = CharacterSet(charactersIn: "[]\\")
 let invalidCTextChars: CharacterSet = CharacterSet(charactersIn: "()\\")
 
+/**
+ Structure that represents an RFC 822 header field of the form `name`: `body`.
+ */
 public struct RFC822HeaderField : Equatable {
     public let name: String
     public let body: String
@@ -24,7 +27,7 @@ public struct RFC822HeaderField : Equatable {
 struct RFC822HeaderFieldsUnfolder {
     
     /**
-     Unfolds MIME headers into a single line by replacing any whitespace in the given string
+     Unfolds an RFC 822 header into a single line by replacing any whitespace in the given string
      matching the regex `\r?\n[[:blank:]]+` with a single space for each occurrence.
      
      - Returns: A string with the whitespace modified as described above.
@@ -42,12 +45,28 @@ struct RFC822HeaderFieldsPartitioner {
         case invalidFieldStructure
     }
     
+    /**
+     Parses the given string into an ``RFC822HeaderField`` array using the regex `(.+?):\\s*(.+)`.
+     For each match, the content in the first capture group is place in the header name, and the content in the second
+     capture group is placed in the header body.
+     
+     - Returns: an ``RFC822HeaderField`` array with the header fields from the given string.
+     
+     - Throws: ``Error.invalidFieldStructure`` if a match does not have exactly two capture groups
+     or the name or body range is invalid.
+     */
     func fields(in string: String) throws -> [RFC822HeaderField] {
+        // dot will not match line by default, thus stopping at the 822-defined separator
         let regex = try! NSRegularExpression(pattern: "(.+?):\\s*(.+)", options: [])
+        
+        // each header will be a separate result in the result array
         let results = regex.matches(in: string, options: [], range: string.nsRange)
         
         return try results.map { result in
-            guard result.numberOfRanges == 3, let nameRange = Range<String.Index>(result.range(at: 1), in: string), let bodyRange = Range<String.Index>(result.range(at: 2), in: string) else {
+            // verifying that the result has exactly 2 capture groups (plus the entire match)
+            guard result.numberOfRanges == 3,
+                  let nameRange = Range<String.Index>(result.range(at: 1), in: string),
+                  let bodyRange = Range<String.Index>(result.range(at: 2), in: string) else {
                 throw Error.invalidFieldStructure
             }
             
