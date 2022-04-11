@@ -128,10 +128,17 @@ class StringScanner<Special: SpecialProtocol> where Special.RawValue == String {
         case invalidText
     }
     
+    /// The string that this scanner is scanning.
     let string: String
     let startIndex: String.Index
     let endIndex: String.Index
     
+    /**
+     - Parameters:
+        - string: The string to be scanned.
+        - startIndex: The index of the given string to start scanning at. If this argument is nil, the corresponding class variable is set to the starting index of ``string``.
+        - endIndex: The index of the given string to stop scanning at. If this argument is nil, the corresponding class variable is set to the ending index of ``string``.
+     */
     init(_ string: String, startIndex: String.Index? = nil, endIndex: String.Index? = nil) {
         self.string = string
         self.startIndex = startIndex ?? string.startIndex
@@ -139,6 +146,7 @@ class StringScanner<Special: SpecialProtocol> where Special.RawValue == String {
         self.position = self.startIndex
     }
     
+    /// The current index of this scanner within ``string``. This is updated in within the various scanning methods.
     private var position: String.Index
     
     private let whitespace = Character(" ")
@@ -153,8 +161,10 @@ class StringScanner<Special: SpecialProtocol> where Special.RawValue == String {
     }
 
     /**
+     Updates ``position`` to the index of the next character as long as no errors are thrown.
+     
      - Throws: ``Error.invalidSpecial`` if a `Special` object cannot be created from the raw value
-     of the String representation of the character.
+     of the String representation of the character. ``Error.endOfString`` if ``position`` is equal to ``endIndex``.
      
      - Returns: A `Special` representation of the character at ``position`` if it points to a
      special character.
@@ -168,7 +178,10 @@ class StringScanner<Special: SpecialProtocol> where Special.RawValue == String {
     }
     
     /**
+     Advances ``position`` by one character if no errors are thrown.
+     
      - Throws: ``Error.invalidCharacter`` if the character at ``position`` is contained in ``withExcludedCharacters``.
+     ``Error.endOfString`` if ``position`` is equal to ``endIndex``.
      
      - Returns: The character at ``position`` as long as it is not contained in the given ``CharacterSet``.
      */
