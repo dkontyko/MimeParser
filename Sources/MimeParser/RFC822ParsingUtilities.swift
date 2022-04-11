@@ -143,12 +143,22 @@ class StringScanner<Special: SpecialProtocol> where Special.RawValue == String {
     
     private let whitespace = Character(" ")
     
+    /**
+     Advances ``position`` by one index position unless its index does not point at a space.
+     */
     func trimWhiteSpaces() {
         while position != endIndex && string[position] == whitespace {
             position = string.index(after: position)
         }
     }
 
+    /**
+     - Throws: ``Error.invalidSpecial`` if a `Special` object cannot be created from the raw value
+     of the String representation of the character.
+     
+     - Returns: A `Special` representation of the character at ``position`` if it points to a
+     special character.
+     */
     func scanSpecial() throws -> Special {
         guard position != endIndex else { throw Error.endOfString }
         let char = string[position]
@@ -157,6 +167,11 @@ class StringScanner<Special: SpecialProtocol> where Special.RawValue == String {
         return special
     }
     
+    /**
+     - Throws: ``Error.invalidCharacter`` if the character at ``position`` is contained in ``withExcludedCharacters``.
+     
+     - Returns: The character at ``position`` as long as it is not contained in the given ``CharacterSet``.
+     */
     private func scanTextChar(withExcludedCharacters excluded: CharacterSet) throws -> Character {
         guard position != endIndex else { throw Error.endOfString }
         let char = string[position]

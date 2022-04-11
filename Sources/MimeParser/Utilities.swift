@@ -10,6 +10,11 @@ import Foundation
 
 extension Array where Element: Equatable {
     
+    /**
+     Helper function to remove a given key:value pair from the
+     array where the argument matches a key value. This function
+     has no effect if the given key doesn't exist.
+     */
     mutating func remove(_ element: Element) {
         if let index = firstIndex(of: element) {
             remove(at: index)
