@@ -59,6 +59,7 @@ class ContentDispositionFieldParser {
 struct HeaderParser {
     
     static func parse(_ string: String) throws -> MimeHeader {
+        /// Separate header fields into name:body pairs in a dictionary (technically [name:RFC822HeaderField])
         let unfolded = RFC822HeaderFieldsUnfolder().unfold(in: string)
         var fields = try RFC822HeaderFieldsPartitioner().fields(in: unfolded)
         
@@ -67,6 +68,7 @@ struct HeaderParser {
             fieldsByName[each.name] = each
         }
         
+        /// Parses the Content-Transfer-Encoding header if it exists.
         let contentTransferEncoding: ContentTransferEncoding?
         if let field = fieldsByName[caseInsensitive: "Content-Transfer-Encoding"] {
             let parser = ContentTransferEncodingFieldParser()
