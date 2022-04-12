@@ -193,6 +193,14 @@ class StringScanner<Special: SpecialProtocol> where Special.RawValue == String {
         return char
     }
     
+    /**
+     Starting at ``position``, scans ``string`` character by character until it locates a character contained in ``excluded``.
+     Advances ``position`` to the last character before the character on which the error was caught.
+     
+     - Throws: ``Error`` if an excluded character is the first character scanned.
+     
+     -  Returns: A substring of ``string`` from the starting scan position to (but not including) the final scanned position.
+     */
     func scanText(withExcludedCharacters excluded: CharacterSet) throws -> String {
         let startPosition = position
         
@@ -211,9 +219,15 @@ class StringScanner<Special: SpecialProtocol> where Special.RawValue == String {
         return String(string[startPosition..<position])
     }
 
+    /**
+     
+     */
     func scanTextEnclosed(left: Special, right: Special, excludedCharacters: CharacterSet) throws -> String {
         let position = self.position
+        
         do {
+            /// Throws error if the first scanned character does not match ``left``.
+            /// If no error is thrown, ``position`` will be advanced by one character.
             let leftSpecial = try scanSpecial()
             if leftSpecial != left {
                 throw Error.invalidText
