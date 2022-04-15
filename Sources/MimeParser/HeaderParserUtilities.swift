@@ -77,6 +77,7 @@ struct HeaderFieldLexer {
         return set
     }()
     
+    /// - Returns: The next ``Token`` in the header string, or nil is there are no more tokens.
     private func nextToken(withScanner scanner: StringScanner<Special>) -> Token? {
         /// Skips any starting whitespace
         scanner.trimWhiteSpaces()
@@ -137,14 +138,17 @@ class HeaderFieldTokenProcessor {
         case invalidAtom
     }
     
+    /// The tokens that this object will be processing.
     let tokens: [HeaderFieldLexer.Token]
     
     init(tokens: [HeaderFieldLexer.Token]) {
         self.tokens = tokens
     }
     
+    /// The index of the current token in ``tokens``.
     private var cursor: Int = 0
     
+    /// True if the cursor is at the end of ``tokens``.
     var isAtEnd: Bool {
         return cursor == tokens.count
     }
