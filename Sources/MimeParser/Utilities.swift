@@ -50,6 +50,8 @@ extension String {
 extension String {
     
     
+    /// If a character from the given ``CharacterSet`` is the first character in the string, returns a substring from the
+    /// next chracter in the string to the end of the string. Otherwise, returns the string unchanged.
     func leftTrimmFirstCharacter(in set: CharacterSet) -> String {
         guard startIndex != endIndex else { return self }
         
@@ -61,6 +63,8 @@ extension String {
         return self
     }
     
+    /// Returns a substring starting from the first character that is not a member of the given ``CharacterSet``.
+    /// If the first character in the string is not in the set, returns the string unchanged.
     func leftTrimmingCharacters(in set: CharacterSet) -> String {
         var idx = startIndex
         repeat {

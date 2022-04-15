@@ -8,6 +8,7 @@
 
 import Foundation
 
+/// Represents the characters that cannot be contained within a quoted string.
 let invalidQTextChars: CharacterSet = CharacterSet(charactersIn: "\"\\")
 let invalidDTextChars: CharacterSet = CharacterSet(charactersIn: "[]\\")
 let invalidCTextChars: CharacterSet = CharacterSet(charactersIn: "()\\")
@@ -119,6 +120,7 @@ protocol SpecialProtocol : RawRepresentable {
     static var all: [Self] { get }
 }
 
+/// Provides utilities for scanning a string for text or other special characters as part of the tokenization process.
 class StringScanner<Special: SpecialProtocol> where Special.RawValue == String {
     
     enum Error : LocalizedError {
@@ -161,12 +163,13 @@ class StringScanner<Special: SpecialProtocol> where Special.RawValue == String {
     }
 
     /**
+     Retrieves the current character at ``position``.
      Updates ``position`` to the index of the next character as long as no errors are thrown.
      
      - Throws: ``Error.invalidSpecial`` if a `Special` object cannot be created from the raw value
      of the String representation of the character. ``Error.endOfString`` if ``position`` is equal to ``endIndex``.
      
-     - Returns: A `Special` representation of the character at ``position`` if it points to a
+     - Returns: A `Special` representation of the retrieved character if it points to a
      special character.
      */
     func scanSpecial() throws -> Special {
@@ -195,7 +198,7 @@ class StringScanner<Special: SpecialProtocol> where Special.RawValue == String {
     
     /**
      Starting at ``position``, scans ``string`` character by character until it locates a character contained in ``excluded``.
-     Advances ``position`` to the last character before the character on which the error was caught.
+     Advances ``position`` to the index of the character on which the error was caught.
      
      - Throws: ``Error`` if an excluded character is the first character scanned.
      
@@ -219,9 +222,14 @@ class StringScanner<Special: SpecialProtocol> where Special.RawValue == String {
         return String(string[startPosition..<position])
     }
 
-    /**
-     
-     */
+    /// Retrieves the string of text between (but not including) the given left and right special characters, starting at ``position``.
+    ///
+    /// If the string is not formatted in the pattern `<left><text excluding excludedCharacters><right>`, then the method
+    /// will throw an error.
+    ///
+    /// - Throws: An error if the text in the string does not match the pattern above.
+    ///
+    /// - Returns: The scanned text between (but not including) the given left and right chracters.
     func scanTextEnclosed(left: Special, right: Special, excludedCharacters: CharacterSet) throws -> String {
         let position = self.position
         
@@ -233,6 +241,8 @@ class StringScanner<Special: SpecialProtocol> where Special.RawValue == String {
                 throw Error.invalidText
             }
             
+            /// Retrieves the text starting from ``position`` to (but not including) the first chracter
+            /// in the given set.
             let str = try scanText(withExcludedCharacters: excludedCharacters)
             
             let rightSpecial = try scanSpecial()
@@ -247,6 +257,8 @@ class StringScanner<Special: SpecialProtocol> where Special.RawValue == String {
         }
     }
     
+    /// Includes the ASCII space, all of the characters in the ``Special`` enum,
+    /// and the ASCII values of 0 to 31 inclusive.
     private let invalidAtomChars: CharacterSet = {
         var set = CharacterSet(charactersIn: " ")
         set.insert(charactersIn: Special.all.reduce("", { return $0 + $1.rawValue }))
@@ -254,6 +266,7 @@ class StringScanner<Special: SpecialProtocol> where Special.RawValue == String {
         return set
     }()
     
+    /// Convenience method that calls `scanText(withExcludedCharacters: invalidAtomChars)`.
     func scanAtom() throws -> String {
         return try scanText(withExcludedCharacters: invalidAtomChars)
     }
