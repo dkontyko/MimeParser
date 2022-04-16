@@ -9,6 +9,8 @@
 import Foundation
 
 struct HeaderFieldLexer {
+    
+    /// Represents the possible valid special characters in a MIME message.
     enum Special : String, SpecialProtocol {
         case leftParentheses = "("
         case rightParentheses = ")"
@@ -50,6 +52,8 @@ struct HeaderFieldLexer {
         }()
     }
     
+    /// Represents the possible types of tokens into which a header field
+    /// can be split.
     enum Token : Equatable {
         case quotedString(String)
         case token(String)
@@ -65,6 +69,7 @@ struct HeaderFieldLexer {
         }
     }
     
+    /// Represents the characters that cannot be part of a standard, non-quoted textual string in the header.
     private let invalidTokenChars: CharacterSet = {
         var set = CharacterSet(charactersIn: " ")
         set.insert(charactersIn: Range<Unicode.Scalar>(uncheckedBounds: (lower: Unicode.Scalar(0), upper: Unicode.Scalar(31))))
@@ -72,22 +77,27 @@ struct HeaderFieldLexer {
         return set
     }()
     
+    /// - Returns: The next ``Token`` in the header string, or nil is there are no more tokens.
     private func nextToken(withScanner scanner: StringScanner<Special>) -> Token? {
+        /// Skips any starting whitespace
         scanner.trimWhiteSpaces()
         
         do {
+            /// Checks if the next part of the string is enclosed in quotes; returns the quoted string if so.
             let str = try scanner.scanTextEnclosed(left: .quotationMark, right: .quotationMark, excludedCharacters: invalidQTextChars)
             return .quotedString(str)
         } catch {
         }
         
         do {
+            /// If a quoted string was not found, checks for a non-quoted textual string and returns it if so.
             let str = try scanner.scanText(withExcludedCharacters: invalidTokenChars)
             return .token(str)
         } catch {
         }
         
         do {
+            /// If neither type of string above was found, checks for a special character and returns it if so.
             let special = try scanner.scanSpecial()
             return .special(special)
         } catch {
@@ -96,6 +106,10 @@ struct HeaderFieldLexer {
         return nil
     }
     
+    /// Scans the given string and lexes it into a series of tokens
+    /// based on the acceptable characters in a MIME header.
+    ///
+    /// - Returns: The lexed tokens in a ``Token`` array.
     func scan(_ string: String) -> [Token] {
         let scanner = StringScanner<Special>(string)
         var tokens = [Token]()
@@ -124,14 +138,17 @@ class HeaderFieldTokenProcessor {
         case invalidAtom
     }
     
+    /// The tokens that this object will be processing.
     let tokens: [HeaderFieldLexer.Token]
     
     init(tokens: [HeaderFieldLexer.Token]) {
         self.tokens = tokens
     }
     
+    /// The index of the current token in ``tokens``.
     private var cursor: Int = 0
     
+    /// True if the cursor is at the end of ``tokens``.
     var isAtEnd: Bool {
         return cursor == tokens.count
     }

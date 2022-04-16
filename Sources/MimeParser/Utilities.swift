@@ -10,6 +10,11 @@ import Foundation
 
 extension Array where Element: Equatable {
     
+    /**
+     Helper function to remove a given key:value pair from the
+     array where the argument matches a key value. This function
+     has no effect if the given key doesn't exist.
+     */
     mutating func remove(_ element: Element) {
         if let index = firstIndex(of: element) {
             remove(at: index)
@@ -19,24 +24,34 @@ extension Array where Element: Equatable {
 
 extension String {
     
+    /// Returns the ``Range`` of the entire String.
     var range: Range<String.Index> {
         return Range<String.Index>(uncheckedBounds: (lower: startIndex, upper: endIndex))
     }
     
+    /// Returns the ``NSRange`` version of ``range``.
     var nsRange: NSRange {
         return NSRange(range, in: self)
     }
     
+    /**
+     Searches this ``String`` for a newline (using the regex `\r?\n`) within the specified range.
+     
+     - Returns: The ``Range`` of the first matching newline if one is present, or `nil`.
+     */
     func rangeOfRFC822NewLine(in searchRange: Range<String.Index>) -> Range<String.Index>? {
         let regex = try! NSRegularExpression(pattern: "\r?\n", options: [])
         let matchResults = regex.firstMatch(in: self, options: [], range: NSRange(searchRange, in: self))
-        let range = matchResults.flatMap { Range<String.Index>($0.range, in: self) }
+        let range = matchResults.flatMap { Range<String.Index>($0.range, in: self) } // converting from NSRange
         return range
     }
 }
 
 extension String {
     
+    
+    /// If a character from the given ``CharacterSet`` is the first character in the string, returns a substring from the
+    /// next chracter in the string to the end of the string. Otherwise, returns the string unchanged.
     func leftTrimmFirstCharacter(in set: CharacterSet) -> String {
         guard startIndex != endIndex else { return self }
         
@@ -48,6 +63,8 @@ extension String {
         return self
     }
     
+    /// Returns a substring starting from the first character that is not a member of the given ``CharacterSet``.
+    /// If the first character in the string is not in the set, returns the string unchanged.
     func leftTrimmingCharacters(in set: CharacterSet) -> String {
         var idx = startIndex
         repeat {
