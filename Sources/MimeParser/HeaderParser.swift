@@ -10,6 +10,12 @@ import Foundation
 
 class ContentTypeParser {
     
+    /// Parses the primary content-type value (e.g., text/plain) into its component type and subtype.
+    ///
+    /// - Returns: The content type and subtype as separate strings in a tuple.
+    ///
+    /// - Throws: Any errors from the processor if processing fails. This function does not perform any
+    ///     error handling.
     private func parseContentTypeComponents(with processor: HeaderFieldTokenProcessor) throws -> (String, String) {
         let type = try processor.expectToken()
         try processor.expectSpecial(.slash)
@@ -17,6 +23,12 @@ class ContentTypeParser {
         return (type, subtype)
     }
     
+    /// Parses the given string as a Content-Type header.
+    ///
+    /// - Returns: The header as a ``ContentType`` object, including the type, subtype,
+    ///     and any parameters.
+    ///
+    /// - Throws: Any errors from the parsing operations. This function does not perform any error handling.
     func parse(_ string: String) throws -> ContentType {
         let lexer = HeaderFieldLexer()
         let tokens = lexer.scan(string)
@@ -31,8 +43,11 @@ class ContentTypeParser {
 
 class ContentTransferEncodingFieldParser {
     
-    /// Parses the given string as a  Content-Transfer-Encoding header and returns it in
-    /// a ``ContentTransferEncoding`` object.
+    /// Parses the given string as a Content-Transfer-Encoding header.
+    ///
+    /// - Returns: The header as a ``ContentTransferEncoding`` object.
+    ///
+    /// - Throws: Any errors from the parsing operations. This function does not perform any error handling.
     func parse(_ string: String) throws -> ContentTransferEncoding {
         let lexer = HeaderFieldLexer()
         let tokens = lexer.scan(string)
