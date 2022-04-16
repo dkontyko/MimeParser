@@ -42,8 +42,13 @@ public enum ContentTransferEncoding : Equatable {
     }
 }
 
+/// Represents the possible subtypes that a multipart message can have.
 public enum MultipartSubtype : Equatable {
+    /// Represents a MIME message whose body is composed
+    /// of multiple MIME parts.
     case mixed
+    /// Represents a MIME message whose body contains multiple
+    /// representations of the same data (e.g., plaintext and HTML).
     case alternative
     case other(String)
     
@@ -65,6 +70,7 @@ public enum MultipartSubtype : Equatable {
     }
 }
 
+/// Represetnts the possible content types of a MIME message.
 public enum MimeType : Equatable {
     case text
     case image
@@ -90,19 +96,28 @@ public enum MimeType : Equatable {
     }
 }
 
+/// Holds the MIME content type of the message.
 public struct ContentType : Equatable {
+    /// The primary type of a MIME message. See also ``mimeType``.
     public let type: String
+    /// The subtype of a MIME message. The possible values are dependent on
+    /// the primary type.
     public let subtype: String
+    /// Any parameters that the content type may have. These are dependent on the
+    /// content type and subtype.
     public let parameters: [String : String]
     
+    /// Returns the MIME representation: `<type>/<subtype>`.
     public var raw: String {
         return "\(type)/\(subtype)"
     }
     
+    /// Returns the `charset` parameter, if it exists.
     public var charset: String? {
         return parameters["charset"]
     }
 
+    /// Returns the `name` parameter, if it exists.
     public var name: String? {
         return parameters["name"]
     }
@@ -113,6 +128,7 @@ public struct ContentType : Equatable {
 }
 
 extension ContentType {
+    /// Returns the `MimeType` representation of this content type.
     public var mimeType: MimeType {
         switch type.lowercased() {	// case-insensitive: https://datatracker.ietf.org/doc/html/rfc2045#section-5.1
         case "text": return .text
@@ -146,9 +162,14 @@ public struct ContentDisposition : Equatable {
     }
 }
 
+/// Holds the standard headers found in a MIME message.
 public struct MimeHeader {
+    /// Represents the encoding type of the message body (e.g., 7bit, base64).
     public let contentTransferEncoding: ContentTransferEncoding?
+    /// Represents the body's content type (e.g., text/plain, multipart/alternative).
     public let contentType: ContentType?
+    /// Indicates the intended disposition of the MIME part (whether the body
+    /// should be displayed inline or treated as an attachment).
     public let contentDisposition: ContentDisposition?
     public let other: [RFC822HeaderField]
 }
