@@ -205,6 +205,13 @@ class HeaderFieldTokenProcessor {
         }
     }
     
+    
+    /// Extracts and discards the next token in the parser if it matches the given special character.
+    ///
+    /// - Parameter special: The special character that is expected to be the next token.
+    ///
+    /// - Throws: ``Error.invalidSpecial`` if the character can't be extracted or it doesn't match
+    ///     the given special character.
     func expectSpecial(_ special: HeaderFieldLexer.Special) throws {
         try withNextToken { token in
             guard case .special(let value) = token, value == special else { throw Error.invalidSpecial }
