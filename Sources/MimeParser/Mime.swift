@@ -8,9 +8,8 @@
 
 import Foundation
 
-/**
- Represents the possible encodings for MIME messages.
- */
+
+ /// Represents the possible encodings for MIME messages.
 public enum ContentTransferEncoding : Equatable {
     case sevenBit
     case eightBit

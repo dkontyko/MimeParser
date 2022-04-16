@@ -55,8 +55,11 @@ struct HeaderFieldLexer {
     /// Represents the possible types of tokens into which a header field
     /// can be split.
     enum Token : Equatable {
+        /// Represents an entire string (possibly including spaces) that was enclosed in quotes.
         case quotedString(String)
+        /// Represents an unquoted textual string.
         case token(String)
+        /// Represents an instance of one of the valid special characters.
         case special(Special)
         
         static func ==(lhs: Token, rhs: Token) -> Bool {
@@ -153,19 +156,35 @@ class HeaderFieldTokenProcessor {
         return cursor == tokens.count
     }
     
+    /// Performs the given closure on the token at ``position`` index in the ``tokens`` array.
+    /// Advances ``cursor`` if the operation is successful; leaves `cursor` unchanged otherwise.
+    ///
+    /// - Returns: The result of the given closure, if the operation is successful.
+    ///
+    /// - Throws:``Error.noMoreTokens`` if ``cursor`` is equal to the ``tokens`` array count.
+    ///     `Error` if the closure results in an error.
     private func withNextToken<T>(_ probe: (HeaderFieldLexer.Token) throws -> T) throws -> T {
         guard cursor < tokens.count else { throw Error.noMoreTokens }
         let token = tokens[cursor]
         
         do {
+            /// Advances the cursor to the next token before operating on the
+            /// temporarily saved token.
             cursor += 1
             return try probe(token)
         } catch {
+            /// Returns the cursor to its previous position if the operation was unsuccessful.
             cursor -= 1
             throw error
         }
     }
     
+    /// Extracts the contents of the quoted string within the next token in the parser. Advances the
+    /// parser's cursor by one index if the operation is successful.
+    ///
+    /// - Throws: ``Error.invalidQuotedString`` if the string extraction is unsuccessful.
+    ///
+    /// - Returns: The contents of the quoted string in the next token.
     func expectQuotedString() throws -> String {
         return try withNextToken { token -> String in
             guard case .quotedString(let value) = token else { throw Error.invalidQuotedString }
@@ -173,6 +192,12 @@ class HeaderFieldTokenProcessor {
         }
     }
     
+    /// Extracts the textual string from the next token in the parser if it's a valid token. Advances the parser's cursor
+    /// by one index if the operation is successful.
+    ///
+    /// - Throws: ``Error.invalidToken`` if the string extraction fails.
+    ///
+    /// - Returns: The `String` value of the next token.
     func expectToken() throws -> String {
         return try withNextToken { token -> String in
             guard case .token(let value) = token else { throw Error.invalidToken }

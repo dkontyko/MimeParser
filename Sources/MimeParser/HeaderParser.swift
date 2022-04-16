@@ -31,6 +31,8 @@ class ContentTypeParser {
 
 class ContentTransferEncodingFieldParser {
     
+    /// Parses the given string as a  Content-Transfer-Encoding header and returns it in
+    /// a ``ContentTransferEncoding`` object.
     func parse(_ string: String) throws -> ContentTransferEncoding {
         let lexer = HeaderFieldLexer()
         let tokens = lexer.scan(string)
@@ -48,6 +50,7 @@ class ContentDispositionFieldParser {
         let lexer = HeaderFieldLexer()
         let tokens = lexer.scan(string)
         let processor = HeaderFieldTokenProcessor(tokens: tokens)
+        /// Retrieves the first token and advances the parser to the next token
         let value = try processor.expectToken()
         let parameters = try HeaderFieldParametersParser.parse(with: processor)
         return ContentDisposition(type: value, parameters: parameters)
