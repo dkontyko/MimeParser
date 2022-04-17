@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "MimeParser"
-  s.version      = "0.2.4"
+  s.version      = "0.2.5"
   s.summary      = "Mime parsing in Swift | Relevant RFCs: RFC 822, RFC 2045, RFC 2046"
 
   s.description  = <<-DESC
@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.license      = { :type => "MIT", :file => "LICENSE" }
   s.author       = "miximka"
 
-  s.ios.deployment_target = "10.3"
+  s.ios.deployment_target = "12.0"
   s.osx.deployment_target = "10.12"
 
   s.source       = { :git => "https://github.com/miximka/MimeParser.git", :tag => "#{s.version}" }
